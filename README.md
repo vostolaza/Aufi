@@ -1,6 +1,7 @@
 # Aufi
 
 ### Integrantes:
+
 - Victor Ostolaza
 - Macarena Oyague
 
@@ -47,3 +48,38 @@ Nuestro `front-end` será desplegado dentro de un `container` a `Cloud Run`, la 
 ### Containers
 
 Para asegurar que no nos topemos con problemas por diferencias en el ambiente de desarrollo y en el productivo, desplegaremos nuestro `front-end` en un contenedor de `Docker`.
+
+---
+
+## Documentación
+
+## Base de datos
+
+```js
+User = {
+  username: String,
+  password: String,
+  tops: [String],
+  bottoms: [String],
+  footwear: [String],
+  accessories: [String],
+  outfits: [Outfit],
+};
+
+Outfit = {
+  top: String,
+  bottom: String,
+  footwear: String,
+  accessory: String,
+  tag: String,
+};
+```
+
+### Rutas Frontend
+
+- `/`: índice con las funcionalidades de la webpage
+- `/register`: registro con username y pwd
+- `/login`: inicio de sesión con username y pwd
+- `/subir-prenda`: upload de archivo con una imagen asociado a una categoría
+- `/arma-tu-aufi`: selección de un conjunto asociado a un tag
+- `/random-aufi`: retorno de un conjunto previamente almacenado en arma-tu-aufi
