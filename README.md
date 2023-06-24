@@ -83,3 +83,15 @@ Outfit = {
 - `/subir-prenda`: upload de archivo con una imagen asociado a una categoría
 - `/arma-tu-aufi`: selección de un conjunto asociado a un tag
 - `/random-aufi`: retorno de un conjunto previamente almacenado en arma-tu-aufi
+
+### Endpoints Backend
+
+#### User service:
+- [GET] `/userService/user/<username>` Retorna información de usuario (prendas y conjuntos)
+- [POST] `/userService/uploadClothing`
+  - ```json
+      {
+        "url" : string,
+        "tag" : string,
+      }
+    ```
