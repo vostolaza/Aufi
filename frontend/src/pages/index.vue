@@ -7,7 +7,6 @@ import IconPuzzle from "~/assets/puzzle.svg?component";
 import FingerPrint from "~/assets/finger-print.svg?component";
 import IconLogout from "~/assets/logout.svg?component";
 
-
 </script>
 
 <template>
