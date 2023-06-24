@@ -1,0 +1,7 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": false
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
