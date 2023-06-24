@@ -3,26 +3,14 @@ import { User, emptyOutfit } from '~/lib/constants';
 
 
 const getClothes = async () => {
-    const res: User = await $fetch("/api/get-user");
+    const res: User = await $fetch("/api/get-user", {
+        method: "POST",
+        body: { username: "crutheo" }
+    });
     return res;
 }
 
 const user: User = await getClothes();
-console.log(user);
-
-/*
-const top = "https://i.ebayimg.com/thumbs/images/g/m4sAAOSw-HNkK2Kc/s-l300.jpg";
-const tops: string[] = [top, top, top, top];
-
-const bottom = "https://i.ebayimg.com/thumbs/images/g/5F0AAOSwQz9iyDqE/s-l300.jpg";
-const bottoms: string[] = [bottom, bottom, bottom, bottom, bottom]
-
-const shoe = "https://www.rebelsport.com.au/dw/image/v2/BBRV_PRD/on/demandware.static/-/Sites-srg-internal-master-catalog/default/dw909b3290/images/42787001/Rebel_42787001_white_hi-res.jpg?sw=750&sh=750&sm=fit&q=60";
-const shoes: string[] = [shoe, shoe]
-
-const accessory = "https://grimey.com/media/catalog/product/g/r/grh337-prp_gorro_grimey_22snow_fox_22_-_purple_winter_22_02.jpg";
-const accessories: string[] = [accessory, accessory, accessory, accessory];
-*/
 
 const open = useGuardarModal();
 const outfit = useCreateOutfit(emptyOutfit());

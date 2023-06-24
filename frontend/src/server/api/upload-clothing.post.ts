@@ -4,12 +4,11 @@ export default defineEventHandler(async (event) => {
     username: "crutheo",
     tag: "accessory",
   };
-  const res = await $fetch(
-    "https://us-central1-aufi-0079.cloudfunctions.net/userService/uploadClothing",
-    {
-      method: "POST",
-      body: obj,
-    }
-  );
+  const url = process.env.GCP_ROUTE;
+
+  const res = await $fetch(`${url}/uploadClothing`, {
+    method: "POST",
+    body: obj,
+  });
   return res;
 });
