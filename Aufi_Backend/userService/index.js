@@ -1,6 +1,6 @@
 const express = require('express');
-// const { Storage } = require('@google-cloud/storage');
-// const multer = require('multer');
+const cors = require('cors');
+
 
 require('dotenv').config();
 const MONGO_IP = process.env.MONGO_IP || '';
@@ -8,13 +8,12 @@ const MONGO_PORT = process.env.MONGO_PORT || '';
 const MONGO_DB = process.env.MONGO_DB || '';
 
 const app = express();
-
-const upload = multer({ storage: multer.memoryStorage() });
-const gcpStorage = new Storage();
+app.use(cors());
 
 const mongoose = require('mongoose');
 
 mongoose.connect(`mongodb://${MONGO_IP}:${MONGO_PORT}/${MONGO_DB}`, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 const userSchema = new mongoose.Schema({
     username: String,
@@ -38,83 +37,37 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 });
 
-app.get('/user', async (req, res) => {
-  // get all users in the user collection
-  const u = await User.find();
-  console.log(u);
-  res.send(u);
-});
-
-app.post('/user', (req, res) => {
-    // get all users in the user collection
-    const username = req.body.username;
-    const password = req.body.password;
-    console.log(username);
-    const u = new User({username : `${username}`, 
-                        password : `${password}`,
-                        tops: [],
-                        bottoms: [],
-                        footwear: [],
-                        accessories: []
-                      });
-    u.save();
-    res.send('User created');
-});
-
-app.post('/uploadClothing', async (req, res) => {
-  console.log('Upload Clothing');
-  // if (!req.file) {
-  //   return res.status(400).send('No file uploaded.');
-  // }
-
-  // // Prepare file for upload
-  // const bucketName = 'aufi';
-  // const filename = Date.now() + req.file.originalname;
-  // const bucket = gcpStorage.bucket(bucketName);
-  // const file = bucket.file(filename);
-  // const blobStream = file.createWriteStream();
-
-  // console.log('Got here');
-
-  // blobStream.on('error', (err) => {
-  //   return res.status(500).send(err);
-  // });
-
-  // blobStream.on('finish', async () => {
-  //   const publicUrl = format(`https://storage.googleapis.com/${bucket.name}/${file.name}`);
-
-  //   // After successful upload, update MongoDB
-  const publicUrl = req.body.url;
+app.post('/uploadClothing', async (req, res, next) => {
   try {
-    const user = await User.findOne({ username: req.body.username });
-    if (!user) {
-      return res.status(404).send('User not found');
-    }
-    
-    const tag  = req.body.tag;
+      const tag  = req.body.tag;
+      const uuid = req.body.uuid;
 
-    if (tag === 'top') {
-      user.tops.push(publicUrl);
-    } else if (tag === 'bottom') {
-      user.bottoms.push(publicUrl);
-    } else if (tag === 'footwear') {
-      user.footwear.push(publicUrl);
-    } else if (tag === 'accessory') {
-      user.accessories.push(publicUrl);
-    } else {
-      return res.status(400).send('Invalid tag');
-    }
+      const publicUrl = `https://storage.googleapis.com/aufi/${uuid}`;
 
-    await user.save();
-    
-    res.status(200).send({ message: 'File uploaded successfully', fileUrl: publicUrl });
-  } catch (err) {
-    return res.status(500).send(err);
+      const user = await User.findOne({ username: req.body.username });
+
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      if (tag === 'top') {
+        user.tops.push(publicUrl);
+      } else if (tag === 'bottom') {
+          user.bottoms.push(publicUrl);
+      } else if (tag === 'footwear') {
+          user.footwear.push(publicUrl);
+      } else if (tag === 'accessory') {
+          user.accessories.push(publicUrl);
+      } else {
+        return res.status(400).send('Invalid tag');
+      }
+
+      res.status(200).send(`Image uploaded successfully: ${publicUrl}`);
+  } catch (error) {
+    next(error);
   }
-  // });
-
-  // blobStream.end(req.file.buffer);
 });
+
 
 app.post('/uploadOutfit', async (req, res) => {
   console.log('Upload Outfit')
