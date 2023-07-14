@@ -86,12 +86,46 @@ Outfit = {
 
 ### Endpoints Backend
 
+#### Auth service:
+
+- [POST] `/signup` Crea un nuevo usuario siempre y cuando el `username` sea único y la contraseña sea segura.
+  	```json
+    {
+      "username" : String,
+      "password" : String
+    }
+    ```
+- [POST] `/login` Inicia la sesión del usuario siempre y cuando el usuario exista en base de datos y la contraseña coincida.
+  	```json
+    {
+      "username" : String,
+      "password" : String
+    }
+    ```
+
 #### User service:
 - [GET] `/userService/user/<username>` Retorna información de usuario (prendas y conjuntos)
-- [POST] `/userService/uploadClothing`
-  - ```json
-      {
-        "url" : string,
-        "tag" : string,
-      }
+- [POST] `/userService/uploadClothing` Sube una prenda y su categoría.
+  ```json
+  {
+    "uuid" : String,
+    "tag" : String,
+    "username" : String
+  }
     ```
+- [POST] `/userService/uploadOutfit` Sube un nuevo conjunto y su etiqueta.
+  ```json
+  {
+    "Outfit" : {
+      "top" : String,
+      "bottom" : String,
+      "footwear" : String,
+      "accessory" : String,
+      "tag": String
+    }
+    "username": String
+  }
+    ```
+- [GET] `/userService/getOufit?username=<username>&tag=<tag>` Devuelve un conjunto aleatorio basado en la etiqueta deseada.
+
+
