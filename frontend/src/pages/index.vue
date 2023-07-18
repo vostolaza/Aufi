@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 
-// añadir una prenda
-
 import IconPlus from "~/assets/plus.svg?component";
 import IconPuzzle from "~/assets/puzzle.svg?component";
 import FingerPrint from "~/assets/finger-print.svg?component";
 import IconLogout from "~/assets/logout.svg?component";
+
+definePageMeta({ middleware: "auth" })
 
 </script>
 
@@ -43,14 +43,14 @@ import IconLogout from "~/assets/logout.svg?component";
                 </div>
             </NavLink>
 
-            <NavLink to="/#" class="my-1">
+            <!--<NavLink to="/#" class="my-1">
                 <div class="flex items-center justify-between space-x-2 hover:bg-gray-100">
                     <div class="flex items-center">
                         <IconLogout class="h-8 w-8 md:h-10 md:w-10" />
                         <h3 class="subtitle-1 pl-2 font-semibold">Cerrar sesión</h3>
                     </div>
                 </div>
-            </NavLink>
+            </NavLink>--->
         </div>
     </div>
 </template>

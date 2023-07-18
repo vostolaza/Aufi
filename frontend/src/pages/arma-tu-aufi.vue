@@ -1,25 +1,26 @@
 <script lang="ts" setup>
 import { User, emptyOutfit } from '~/lib/constants';
 
+const cookie = useCookie("logged_in");
+const open = useGuardarModal();
+const outfit = useCreateOutfit(emptyOutfit());
 
 const getClothes = async () => {
     const res: User = await $fetch("/api/get-user", {
         method: "POST",
-        body: { username: "crutheo" }
+        body: { username: cookie.value }
     });
     return res;
 }
 
 const user: User = await getClothes();
 
-const open = useGuardarModal();
-const outfit = useCreateOutfit(emptyOutfit());
-
 const buttonDisabled = computed(() => {
     // TODO cambiarlo para que si no hay las 3, no se puede, poner handler
     return false;
-    return outfit.value.top == "" && outfit.value.bottom == "" && outfit.value.footwear == "";
 });
+
+definePageMeta({ middleware: "auth" })
 </script>
 
 <template>

@@ -7,18 +7,24 @@ const authRequest = reactive<AuthRequest>({
 });
 const authResponse = ref<AuthResponse>({ error: "", success: "" });
 
-const login = async () => {
+const signup = async () => {
+    authResponse.value.success = authResponse.value.error = "";
+    const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (!regex.test(authRequest.password)) {
+        authResponse.value.success = "";
+        authResponse.value.error = "La contraseña debe tener 8 caracteres: al menos 1 número, 1 letra minúscula y 1 letra mayúscula.";
+        return;
+    }
     try {
-        await $fetch("/api/login", {
+        const res: AuthResponse = await $fetch("/api/signup", {
             method: "POST",
             body: { username: authRequest.username, password: authRequest.password }
         });
         authResponse.value.error = "";
-        authResponse.value.success = "Usuario autenticado.";
-        navigateTo('/')
+        authResponse.value.success = `Username ${authRequest.username} creado satisfactoriamente. Inicie sesión.`;
     } catch (error) {
         authResponse.value.success = "";
-        authResponse.value.error = "Username o contraseña incorrectos.";
+        authResponse.value.error = "Username existente. Intenta con otro.";
     }
 }
 
@@ -60,17 +66,15 @@ const login = async () => {
                 </p>
 
                 <div>
-                    <button @click="login()"
-                        class="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Iniciar
-                        sesión</button>
+                    <button @click="signup()"
+                        class="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">Registrarme</button>
                 </div>
             </div>
 
             <p class="mt-10 text-center text-sm text-gray-400">
-                ¿Primera vez en Aufi?
+                ¿Ya tienes una cuenta?
                 {{ ' ' }}
-                <a href="/signup/" class="font-semibold leading-6 text-black hover:text-indigo-900">Crea una cuenta
-                    gratis
+                <a href="/login/" class="font-semibold leading-6 text-black hover:text-indigo-900">Inicia sesión
                     aquí</a>
             </p>
         </div>

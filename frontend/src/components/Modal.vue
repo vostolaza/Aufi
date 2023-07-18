@@ -6,27 +6,40 @@ import {
     TransitionRoot,
 } from "@headlessui/vue";
 import { XMarkIcon } from "@heroicons/vue/24/solid/esm/index";
-import { Outfit, tags } from "~/lib/constants";
+import { AuthResponse, Outfit, tags } from "~/lib/constants";
 
 const { outfit } = defineProps<{
     outfit: Outfit;
 }>();
 
 const open = useGuardarModal();
-
 const label = "Seleccione una prenda";
 const selected = useTag(label);
+const cookie = useCookie("logged_in");
 
 const buttonDisabled = computed(() => {
     return selected.value == label;
 });
 
+const authResponse = ref<AuthResponse>({ error: "", success: "" });
+
 const uploadAufi = async () => {
-    const res = await $fetch("/api/upload-aufi", {
-        method: "POST",
-        body: { outfit: { ...outfit, tag: selected.value }, username: "crutheo" }
-    });
-    return res;
+    try {
+        const res = await $fetch("/api/upload-aufi", {
+            method: "POST",
+            body: { outfit: { ...outfit, tag: selected.value }, username: cookie.value }
+        });
+        authResponse.value.success = "Outfit subido."
+        setTimeout(() => {
+            authResponse.value.success = ""
+        }, 5000);
+    }
+    catch {
+        authResponse.value.error = "Error. Inténtelo en un minuto."
+        setTimeout(() => {
+            authResponse.value.error = ""
+        }, 5000);
+    }
 }
 
 </script>
@@ -62,6 +75,14 @@ const uploadAufi = async () => {
                                         <h1 class="title-1 text-indigo-900 mb-6 text-center font-bold">
                                             ¿Para qué ocasión usarás este conjunto?</h1>
                                         <DropDown :options="tags" :label="label" />
+                                        <p class="mt-10 text-center text-sm text-red-500" v-if="authResponse.error != ''">
+                                            {{ authResponse.error }}
+                                        </p>
+
+                                        <p class="mt-10 text-center text-sm text-green-500"
+                                            v-if="authResponse.success != ''">
+                                            {{ authResponse.success }}
+                                        </p>
                                         <button
                                             class="mt-6 text-sm bg-black hover:bg-indigo-900 text-white font-bold py-2 px-4 border rounded"
                                             :class="{ 'opacity-50 cursor-not-allowed': buttonDisabled }"

@@ -1,14 +1,63 @@
+import { Storage } from "@google-cloud/storage";
+import { randomUUID } from "crypto";
+import formidable from "formidable";
+import { createReadStream } from "fs";
+import { IncomingMessage } from "http";
+import { SERVICE } from "~/lib/constants";
+
+function parseMultipartNodeRequest(req: IncomingMessage) {
+  return new Promise((resolve, reject) => {
+    const form = formidable({ multiples: true });
+    form.parse(req, (error, fields, files) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve({ ...fields, ...files });
+    });
+  });
+}
+
 export default defineEventHandler(async (event) => {
-  const obj = {
-    url: "https://ripleype.imgix.net/https%3A%2F%2Fdpq25p1ucac70.cloudfront.net%2Fseller-place-files%2Fmrkl-files%2F2136%2FACCESORIOS%2FTGP-080_201614479749_21.jpeg?w=750&h=555&ch=Width&auto=format&cs=strip&bg=FFFFFF&q=60&trimcolor=FFFFFF&trim=color&fit=fillmax&ixlib=js-1.1.0&s=4acced13b61862a3266a369583ba8a98",
-    username: "crutheo",
-    tag: "accessory",
-  };
+  const req = await parseMultipartNodeRequest(event.node.req);
+  // @ts-ignore
+  const file: formidable.File = req.userFile[0];
+  // @ts-ignore
+  const tag = req.tag[0];
+  // @ts-ignore
+  const username = req.username[0];
+
+  const bucketName = "aufi";
+  const config = useRuntimeConfig();
+  const storage = new Storage({
+    projectId: config.public.projectId,
+    credentials: {
+      client_email: config.public.clientEmail,
+      private_key: config.public.privateKey.replace(/\\n/gm, "\n"),
+    },
+  });
+
+  const bucket = storage.bucket(bucketName);
+  const fileName = randomUUID();
+  const fileBucket = storage.bucket(bucketName).file(fileName);
+  createReadStream(file.filepath)
+    .pipe(fileBucket.createWriteStream({ contentType: "image/jpeg" }))
+    .on("finish", () => {
+      console.log("success upload");
+    })
+    .on("error", (error) => {
+      console.log(error);
+    });
+
   const url = process.env.GCP_ROUTE;
 
-  const res = await $fetch(`${url}/uploadClothing`, {
+  const res = await $fetch(`${url}${SERVICE.USER}/uploadClothing`, {
     method: "POST",
-    body: obj,
+    body: { username, tag, uuid: fileName },
   });
-  return res;
+
+  const [files] = await bucket.getFiles();
+  //files.forEach((f) => console.log(f.name));
+
+  return sendRedirect(event, "/success");
 });

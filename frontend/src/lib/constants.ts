@@ -1,4 +1,5 @@
 export const tags = ["casual", "formal", "deportivo"];
+export const tipos = ["footwear", "top", "bottom", "accessory"];
 
 export type Outfit = {
   top: string;
@@ -24,4 +25,19 @@ export const emptyOutfit = (): Outfit => {
     footwear: "",
     accessory: "",
   };
+};
+
+export const SERVICE = {
+  USER: "userService",
+  AUTH: "authService",
+};
+
+export type AuthRequest = {
+  username: string;
+  password: string;
+};
+
+export type AuthResponse = {
+  error: string;
+  success: string;
 };
